@@ -120,21 +120,27 @@ Two critical bugs discovered during UI testing:
 ## Full Git Log (main branch)
 
 ```
-f23c7c1 Merge PR #6 (frontend Tailwind v4 + API header fix)
-d23cef2 fix(frontend): Tailwind v4 CSS import + Accept header + UI polish
-dcdc5da Merge PR #4 (Sprint 3 React UI)
-a5fdd4c fix(backend): PHP 8.4 PDO SSL constant compat + suppress deprecation warnings
-a5d6f39 Merge PR #3 (Sprint 3 React UI)
+PS C:\Users\jhasu\forge2-sunny> git log --oneline --all
+8e1a198 (origin/main, origin/HEAD) Merge pull request #7 from mrskjha/feat/ticket-activity-and-sla
+53d8e8b (HEAD -> feat/ticket-activity-and-sla, origin/feat/ticket-activity-and-sla) feat: add ticket activity log + SLA due date tracking
+e32a9d7 (main) docs: add README, ARCHITECTURE, agent-log, SUBMISSION
+f23c7c1 Merge pull request #6 from mrskjha/fix/frontend-tailwind-v4-and-api-header
+d23cef2 (origin/fix/frontend-tailwind-v4-and-api-header) fix(frontend): Tailwind v4 CSS import + Accept header + UI polish
+dcdc5da Merge pull request #4 from mrskjha/sprint-3-react-ui
+a5fdd4c (origin/sprint-3-react-ui, origin/fix/php84-deprecated-warnings-clean-json-api, sprint-3-react-ui, fix/php84-deprecated-warnings-clean-json-api) fix(backend): PHP 8.4 PDO SSL constant compat + suppress deprecation warnings in API responses
+a5d6f39 Merge pull request #3 from mrskjha/sprint-3-react-ui
 822b81c feat: Sprint 3 React UI for PulseDesk
-f5504ac Merge PR #2 (Sprint 2 core features)
-ae7ba24 test(sprint-2): add feature tests
-a0dbf69 feat(sprint-2): DatabaseSeeder
-3f50219 feat(sprint-2): Sanctum auth + Tickets CRUD + RoleMiddleware
-7e8c595 feat(sprint-2): models + Sanctum config
-4bb4998 feat(sprint-2): migrations
-27130c3 Merge PR #1 (Sprint 1 scaffolding)
-6f794cf fix(ci): create bootstrap/cache dirs
-08e5dcb fix(ci): bump PHP to 8.4
+f5504ac Merge pull request #2 from mrskjha/sprint-2-core-features
+ae7ba24 (origin/sprint-2-core-features, sprint-2-core-features) test(sprint-2): add feature tests (Auth, Ticket CRUD, Multi-tenant isolation) +
+ gitignore cleanup
+a0dbf69 feat(sprint-2): add DatabaseSeeder (1 org, 1 admin, 2 agents, 2 customers, 12 tickets with replies)
+3f50219 feat(sprint-2): add Sanctum auth (register/login/logout), org-scoped Tickets CRUD + replies, RoleMiddleware
+7e8c595 feat(sprint-2): add models (Organization, Ticket, TicketReply), Sanctum config, update User with org_id/role
+4bb4998 feat(sprint-2): add migrations for organizations, users+role, tickets, ticket_replies, sanctum tokens
+27130c3 Merge pull request #1 from mrskjha/sprint-1-scaffolding
+6f794cf (origin/sprint-1-scaffolding, sprint-1-scaffolding) fix(ci): create bootstrap/cache and storage dirs before composer install
+08e5dcb fix(ci): bump PHP version to 8.4 to match composer.lock requirements
 e3b6eee feat: Sprint 1 project scaffolding
 44ee568 first commit
+(END)
 ```
