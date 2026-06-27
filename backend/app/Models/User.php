@@ -6,10 +6,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -20,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'org_id',
+        'role',
     ];
 
     /**
@@ -42,6 +45,39 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => 'string',
         ];
+    }
+
+    /**
+     * Get the organization that the user belongs to.
+     */
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class, 'org_id');
+    }
+
+    /**
+     * Get the tickets requested by the user.
+     */
+    public function requestedTickets()
+    {
+        return $this->hasMany(Ticket::class, 'requester_id');
+    }
+
+    /**
+     * Get the tickets assigned to the user.
+     */
+    public function assignedTickets()
+    {
+        return $this->hasMany(Ticket::class, 'assignee_id');
+    }
+
+    /**
+     * Get the ticket replies by the user.
+     */
+    public function ticketReplies()
+    {
+        return $this->hasMany(TicketReply::class, 'user_id');
     }
 }
