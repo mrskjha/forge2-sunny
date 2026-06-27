@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { StatusBadge, PriorityBadge } from '../components/Badge';
+import { Plus, Inbox, Clock, Loader2, CheckCircle2, Ticket as TicketIcon } from 'lucide-react';
 
 const EMPTY_FORM = { subject: '', description: '', priority: 'medium', tags: '' };
 
@@ -68,7 +69,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Header row */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {user?.name?.split(' ')[0]}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">Here's what's happening in your workspace.</p>
@@ -77,16 +78,17 @@ export default function Dashboard() {
           onClick={() => setShowCreate(true)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-sm transition flex items-center gap-1.5"
         >
-          + New Ticket
+          <Plus className="w-4 h-4" />
+          New Ticket
         </button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label="Total" value={stats.total} color="indigo" />
-        <StatCard label="Open" value={stats.open} color="blue" />
-        <StatCard label="In Progress" value={stats.inProgress} color="amber" />
-        <StatCard label="Resolved" value={stats.resolved} color="emerald" />
+      {/* Stats — Glassmorphism cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard label="Total" value={stats.total} icon={TicketIcon} gradient="from-indigo-500 to-purple-500" />
+        <StatCard label="Open" value={stats.open} icon={Inbox} gradient="from-blue-500 to-cyan-500" />
+        <StatCard label="In Progress" value={stats.inProgress} icon={Loader2} gradient="from-amber-500 to-orange-500" />
+        <StatCard label="Resolved" value={stats.resolved} icon={CheckCircle2} gradient="from-emerald-500 to-teal-500" />
       </div>
 
       {/* Error */}
@@ -98,7 +100,7 @@ export default function Dashboard() {
 
       {/* Create Modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setShowCreate(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowCreate(false)}>
           <div
             className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 max-w-lg w-full"
             onClick={(e) => e.stopPropagation()}
@@ -179,7 +181,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Ticket List */}
+      {/* Ticket Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
         <div className="px-5 py-3.5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <h2 className="font-semibold text-gray-900 dark:text-white">Tickets</h2>
@@ -196,36 +198,44 @@ export default function Dashboard() {
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100 dark:divide-gray-700/50">
-            {tickets.map((ticket) => (
-              <Link
-                key={ticket.id}
-                to={`/tickets/${ticket.id}`}
-                className="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition group"
-              >
-                {/* ID */}
-                <span className="text-xs font-mono text-gray-400 w-10 shrink-0">#{ticket.id}</span>
-                {/* Subject + tags */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
-                    {ticket.subject}
-                  </p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs text-gray-400">
-                      {ticket.requester?.name || 'Unknown'}
-                    </span>
-                    {ticket.tags?.length > 0 && (
-                      <span className="text-xs text-gray-400">· {ticket.tags.join(', ')}</span>
-                    )}
-                  </div>
-                </div>
-                {/* Badges */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <PriorityBadge priority={ticket.priority} />
-                  <StatusBadge status={ticket.status} />
-                </div>
-              </Link>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 dark:bg-gray-900/50 text-left">
+                  <th className="px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">ID</th>
+                  <th className="px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Subject</th>
+                  <th className="px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Requester</th>
+                  <th className="px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Priority</th>
+                  <th className="px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
+                {tickets.map((ticket, i) => (
+                  <tr
+                    key={ticket.id}
+                    onClick={() => (window.location.href = `/tickets/${ticket.id}`)}
+                    className={`cursor-pointer hover:bg-indigo-50/50 dark:hover:bg-gray-700/40 transition ${i % 2 === 1 ? 'bg-gray-50/50 dark:bg-gray-900/30' : ''}`}
+                  >
+                    <td className="px-5 py-3 text-xs font-mono text-gray-400">#{ticket.id}</td>
+                    <td className="px-5 py-3">
+                      <Link to={`/tickets/${ticket.id}`} className="text-sm font-medium text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400" onClick={(e) => e.stopPropagation()}>
+                        {ticket.subject}
+                      </Link>
+                      {ticket.tags?.length > 0 && (
+                        <div className="flex gap-1 mt-0.5">
+                          {ticket.tags.map((tag) => (
+                            <span key={tag} className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-400">{tag}</span>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-5 py-3 text-gray-500 dark:text-gray-400">{ticket.requester?.name || 'Unknown'}</td>
+                    <td className="px-5 py-3"><PriorityBadge priority={ticket.priority} /></td>
+                    <td className="px-5 py-3"><StatusBadge status={ticket.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
@@ -233,17 +243,20 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ label, value, color }) {
-  const colorMap = {
-    indigo: 'text-indigo-600 dark:text-indigo-400',
-    blue: 'text-blue-600 dark:text-blue-400',
-    amber: 'text-amber-600 dark:text-amber-400',
-    emerald: 'text-emerald-600 dark:text-emerald-400',
-  };
+function StatCard({ label, value, icon: Icon, gradient }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4">
-      <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">{label}</p>
-      <p className={`text-2xl font-bold mt-1 ${colorMap[color]}`}>{value}</p>
+    <div className={`relative overflow-hidden rounded-xl p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition`}>
+      {/* Gradient accent */}
+      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${gradient}`} />
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">{label}</p>
+          <p className="text-2xl font-bold mt-1 text-gray-900 dark:text-white">{value}</p>
+        </div>
+        <div className={`p-2 rounded-lg bg-gradient-to-br ${gradient} bg-opacity-10`}>
+          <Icon className="w-5 h-5 text-white" />
+        </div>
+      </div>
     </div>
   );
 }

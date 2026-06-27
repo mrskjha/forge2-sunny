@@ -5,7 +5,10 @@ function getToken() {
 }
 
 async function request(path, { method = 'GET', body, auth = true } = {}) {
-  const headers = { 'Content-Type': 'application/json' };
+  const headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
 
   if (auth) {
     const token = getToken();
