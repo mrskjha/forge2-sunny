@@ -23,6 +23,7 @@ class Ticket extends Model
         'requester_id',
         'assignee_id',
         'org_id',
+        'sla_due_at',
     ];
 
     /**
@@ -34,7 +35,16 @@ class Ticket extends Model
     {
         return [
             'tags' => 'array',
+            'sla_due_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the activity logs for the ticket.
+     */
+    public function activities()
+    {
+        return $this->hasMany(TicketActivity::class, 'ticket_id')->latest('id');
     }
 
     /**
