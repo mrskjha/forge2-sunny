@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Models\TicketActivity;
 use App\Models\TicketReply;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -48,6 +49,14 @@ class TicketController extends Controller
             'requester_id' => $request->user()->id,
             'assignee_id' => $request->assignee_id,
             'org_id' => $request->user()->org_id,
+            'sla_due_at' => now()->addHours(24),
+        ]);
+
+        // Log creation
+        TicketActivity::create([
+            'ticket_id' => $ticket->id,
+            'user_id' => $request->user()->id,
+            'action' => 'Ticket created',
         ]);
 
         return response()->json($ticket->load(['requester', 'assignee']), 201);
@@ -59,7 +68,7 @@ class TicketController extends Controller
     public function show(Request $request, $id)
     {
         $ticket = Ticket::forOrganization($request->user()->org_id)
-            ->with(['requester', 'assignee', 'replies.user'])
+            ->with(['requester', 'assignee', 'replies.user', 'activities.user'])
             ->findOrFail($id);
 
         return response()->json($ticket);
@@ -88,6 +97,25 @@ class TicketController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Record activity logs for status / priority changes
+        if ($request->has('status') && $request->status !== $ticket->status) {
+            $label = ucwords(str_replace('_', ' ', $request->status));
+            TicketActivity::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => $request->user()->id,
+                'action' => "Changed status to {$label}",
+            ]);
+        }
+
+        if ($request->has('priority') && $request->priority !== $ticket->priority) {
+            $label = ucfirst($request->priority);
+            TicketActivity::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => $request->user()->id,
+                'action' => "Changed priority to {$label}",
+            ]);
         }
 
         $ticket->update($request->only(['subject', 'description', 'status', 'priority', 'tags', 'assignee_id']));
@@ -129,6 +157,13 @@ class TicketController extends Controller
             'ticket_id' => $ticket->id,
             'user_id' => $request->user()->id,
             'body' => $request->body,
+        ]);
+
+        // Log reply activity
+        TicketActivity::create([
+            'ticket_id' => $ticket->id,
+            'user_id' => $request->user()->id,
+            'action' => 'Replied to ticket',
         ]);
 
         return response()->json($reply->load('user'), 201);
