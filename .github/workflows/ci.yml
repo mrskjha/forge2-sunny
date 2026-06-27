@@ -34,6 +34,12 @@ jobs:
       - name: Copy .env
         run: cp backend/.env.example backend/.env
 
+      - name: Ensure writable directories
+        run: |
+          cd backend
+          mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} storage/logs
+          chmod -R 775 bootstrap/cache storage
+
       - name: Install dependencies
         run: |
           cd backend
