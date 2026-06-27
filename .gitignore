@@ -30,3 +30,12 @@ backend/yarn-error.log
 
 # Build artifacts
 *.local
+
+# OpenClaw agent workspace files
+AGENTS.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TOOLS.md
+USER.md
+openclaw-workspace-state.json
